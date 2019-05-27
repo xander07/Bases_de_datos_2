@@ -8,7 +8,7 @@ DECLARE
 BEGIN
     SELECT MAX(pesomax) INTO pesomax FROM CAMION;
     IF(:NEW.peso > pesomax) THEN
-        RAISE_APPLICATION_ERROR(-1313,'El peso de un producto no puede ser mayor al camion mas grande');
+        RAISE_APPLICATION_ERROR(-20000,'El peso de un producto no puede ser mayor al camion mas grande');
     END IF;
 END;
 
@@ -20,7 +20,7 @@ DECLARE
 BEGIN
     SELECT MAX(pesomax) INTO pesomax FROM CAMION;
     IF(:NEW.peso > pesomax) THEN
-        RAISE_APPLICATION_ERROR(-1313,'El peso de un producto no puede ser mayor al camion mas grande');
+        RAISE_APPLICATION_ERROR(-20000,'El peso de un producto no puede ser mayor al camion mas grande');
     END IF;
 END;
 
