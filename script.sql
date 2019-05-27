@@ -7,7 +7,5 @@ BEGIN
     SELECT MAX(pesomax) INTO pesomax FROM CAMION;
     IF(:NEW.peso > pesomax) THEN
         RAISE_APPLICATION_ERROR(-1313,'El peso de un producto no puede ser mayor al camion mas grande');
-    ELSE
-        INSERT INTO PRODUCTO :NEW;
     END IF;
 END;
