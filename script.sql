@@ -43,6 +43,8 @@ DECLARE
     CONNECT BY NOCYCLE PRIOR CIUDADFIN = CIUDADINICIO;
     lowestP RUTADIRECTA.COSTO%TYPE;
     partialP RUTADIRECTA.COSTO%TYPE;
+    value2check RUTADIRECTA.COSTO%TYPE;
+    bif NUMBER(1);
     arrived NUMBER(1);
 BEGIN
     lowestP := 0;
@@ -50,11 +52,11 @@ BEGIN
     arrived := 0;
     FOR p IN PATHS LOOP
         IF arrived = 1 THEN
+            arrived := 0;
             IF p.CIUDADINICIO = :NEW.CIUDADINICIO THEN
                 partialP := 0;
-                arrived := 0;
             ELSE
-                CONTINUE;
+                partialP := value2check;
             END IF;
         END IF;
         partialP := partialP + p.COSTO;
@@ -62,6 +64,11 @@ BEGIN
             arrived := 1;
             IF partialP < lowestP OR lowestP = 0 THEN
                 lowestP := partialP;
+            END IF;
+        ELSIF p.CIUDADINICIO <> :NEW.CIUDADINICIO THEN
+            SELECT COUNT(*) INTO bif FROM RUTADIRECTA WHERE CIUDADINICIO = p.CIUDADINICIO;
+            IF bif > 1 THEN
+                value2check := partialP;
             END IF;
         END IF;
     END LOOP;
