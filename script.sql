@@ -76,3 +76,30 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20001,'No puede agregar una ruta directa que cueste más que la menor compuesta');
     END IF;
 END;
+
+--2.b
+CREATE OR REPLACE TRIGGER control_max_caminos
+BEFORE INSERT ON RUTADIRECTA
+FOR EACH ROW
+DECLARE
+    rowcount NUMBER;
+    CURSOR ciudades IS
+    SELECT DISTINCT CIUDADINICIO AS value FROM RUTADIRECTA;
+BEGIN
+    FOR ciudad IN CIUDADES LOOP
+        SELECT COUNT(*) INTO rowcount FROM
+            (SELECT CIUDADFIN, COUNT(CIUDADFIN) AS PATHS FROM (
+                SELECT * FROM (
+                    SELECT * FROM RUTADIRECTA
+                    UNION
+                    SELECT :NEW.CIUDADINICIO AS CIUDADINICIO, :NEW.CIUDADFIN AS CIUDADFIN, :NEW.COSTO AS COSTO FROM DUAL
+                )
+                START WITH CIUDADINICIO = ciudad.value
+                CONNECT BY NOCYCLE PRIOR CIUDADFIN = CIUDADINICIO
+            )GROUP BY CIUDADFIN)
+        WHERE PATHS > 3;
+        IF rowcount > 0 THEN
+            RAISE_APPLICATION_ERROR(-20002,'No pueden existir mas de 3 caminos de una ciudad a otra');
+        END IF;
+    END LOOP;
+END;
